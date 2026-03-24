@@ -6,7 +6,7 @@
 The system context is the top level that illustrates the entire system as a whole and the complex way it interacts with both the human user and the adjacent operating environment.
 
 * **User:** A Windows desktop user who interacts directly with the application's graphical interface to quickly and efficiently locate the various files stored on their local drives.
-* **System (Local Search Engine):** The core application developed in C# that has the vital role of indexing the files on the current device, including documents, media files, and binary files, with the aim of providing an extremely fast search experience where results appear fluidly as the user types.
+* **System (Local Search Engine):** The core application developed in C# that has the role of indexing the files on the current device, including documents, media files, and binary files, with the aim of providing an extremely fast search experience where results appear fluidly as the user types.
 
 ## 2. Containers 
 The system context is made up of a series of containers that function as distinct deployable units, thus facilitating the logical organization of the entire architectural ensemble.
