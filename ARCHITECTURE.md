@@ -18,7 +18,7 @@ The system context is made up of a series of containers that function as distinc
 ## 3. Components 
 Each container is made up of several interconnected components, these representing the major structural blocks in the code that ensure the specific and robust functionality of the system.
 
-* **File Crawler:** A core component that recursively traverses the Windows file system and must be designed to gracefully and without crashing handle all those unforeseen edge cases, such as file permission issues, infinite symbolic link loops, or database connection timeouts.
+* **File Crawler:** A core component that recursively traverses the Windows file system and must be designed to handle all those  edge cases, such as file permission issues or database connection timeouts.
 * **Content and Metadata Extractor:** An entity responsible for extracting every bit of information deemed important, including preserving all available metadata, such as extensions, tags, or timestamps, to easily support future use cases.
 * **Search and Preview Controller:** An intelligent module that translates user queries into appropriate SQL commands to allow single-word and multi-word searches to function properly, while returning useful contextual snippets, such as the first three lines of text of a found document.
 
