@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using SDAssig;
 
-namespace testproiect
+namespace SDAssig
 {
 	public class FileCrawler
 	{
