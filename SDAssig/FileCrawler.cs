@@ -7,27 +7,34 @@ namespace SDAssig
 {
 	public class FileCrawler
 	{
-		private DatabaseManager db;
+		private readonly IDatabaseService _db;
 
-		public FileCrawler(DatabaseManager database)
+		public FileCrawler(IDatabaseService database)
 		{
-			db = database;
+			_db = database;
 		}
 
 		public void IndexDirectory(string targetDirectory)
 		{
-			var files = Directory.GetFiles(targetDirectory, "*.*", SearchOption.AllDirectories)
-				.Where(f => f.EndsWith(".txt") || f.EndsWith(".cs") || f.EndsWith(".md")).ToList();
+			string[] allFiles = Directory.GetFiles(targetDirectory, "*.*", SearchOption.AllDirectories);
 
-			foreach (string filePath in files)
+			List<string> filteredFiles = new List<string>();
+
+			foreach (string filePath in allFiles)
+			{
+				if (filePath.EndsWith(".txt") || filePath.EndsWith(".cs") || filePath.EndsWith(".md"))
+				{
+					filteredFiles.Add(filePath);
+				}
+			}
+
+			foreach (string filePath in filteredFiles)
 			{
 				try
 				{
 					string content = string.Join(" ", File.ReadLines(filePath).Take(3));
-
 					string lastMod = File.GetLastWriteTime(filePath).ToString();
-					db.SaveFile(filePath, content, lastMod);
-
+					_db.SaveFile(filePath, content, lastMod);
 				}
 				catch (Exception ex)
 				{

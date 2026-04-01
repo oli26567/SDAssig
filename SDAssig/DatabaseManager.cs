@@ -4,13 +4,16 @@ using System.IO;
 
 namespace SDAssig
 {
-	public class DatabaseManager
+	public class DatabaseManager : IDatabaseService
 	{
 		private string dbPath = "C:\\An3\\SD\\search_engine.db";
 
 		public void Initialize()
 		{
-			if (!Directory.Exists("C:\\An3\\SD")) Directory.CreateDirectory("C:\\An3\\SD");
+			if (!Directory.Exists("C:\\An3\\SD"))
+			{
+				Directory.CreateDirectory("C:\\An3\\SD");
+			}
 
 			using (var connection = new SqliteConnection("Data Source=" + dbPath))
 			{

@@ -6,15 +6,15 @@ namespace SDAssig
 {
     public partial class Form1 : Form
     {
-        private DatabaseManager db = new DatabaseManager();
-        private FileCrawler crawler;
+		private IDatabaseService db = new DatabaseManager();
+		private FileCrawler crawler;
 
         public Form1()
         {
             InitializeComponent();
             db.Initialize();
-            crawler = new FileCrawler(db);
-        }
+			crawler = new FileCrawler(db);
+		}
 
         private void btnIndex_Click(object sender, EventArgs e)
         {
