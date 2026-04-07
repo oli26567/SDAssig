@@ -79,12 +79,28 @@ namespace SDAssig
 		public List<SearchResult> SearchFiles(string query)
 		{
 			var results = new List<SearchResult>();
+
+			string[] words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+			if (words.Length == 0) return results;
+
 			using (var connection = new SqliteConnection("Data Source=" + dbPath))
 			{
 				connection.Open();
 				var command = connection.CreateCommand();
-				command.CommandText = "SELECT FileName, FilePath, Content FROM Files WHERE Content LIKE @q OR FileName LIKE @q";
-				command.Parameters.AddWithValue("@q", "%" + query + "%");
+
+				string sql = "SELECT FileName, FilePath, Content FROM Files WHERE ";
+				List<string> conditions = new List<string>();
+
+				for (int i = 0; i < words.Length; i++)
+				{
+					string paramName = "@p" + i;
+					conditions.Add("(Content LIKE " + paramName + " OR FileName LIKE " + paramName + ")");
+
+					command.Parameters.AddWithValue(paramName, "%" + words[i] + "%");
+				}
+
+				command.CommandText = sql + string.Join(" AND ", conditions);
 
 				using (var reader = command.ExecuteReader())
 				{
