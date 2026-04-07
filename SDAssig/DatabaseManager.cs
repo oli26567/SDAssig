@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,15 +7,17 @@ namespace SDAssig
 {
 	public class DatabaseManager : IDatabaseService
 	{
-		private string dbPath = "C:\\An3\\SD\\search_engine.db";
+		private string dbPath;
+
+		public DatabaseManager()
+		{
+			string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SDAssig");
+			if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+			dbPath = Path.Combine(folder, "search_engine.db");
+		}
 
 		public void Initialize()
 		{
-			if (!Directory.Exists("C:\\An3\\SD"))
-			{
-				Directory.CreateDirectory("C:\\An3\\SD");
-			}
-
 			using (var connection = new SqliteConnection("Data Source=" + dbPath))
 			{
 				connection.Open();
@@ -25,65 +28,89 @@ namespace SDAssig
                         FilePath TEXT UNIQUE,
                         FileName TEXT,
                         Content TEXT,
-                        LastModified TEXT
+                        LastModified TEXT,
+                        FileSize INTEGER,
+                        Extension TEXT
                     );";
 				command.ExecuteNonQuery();
 			}
 		}
 
+		public string GetStoredTimestamp(string path)
+		{
+			using (var connection = new SqliteConnection("Data Source=" + dbPath))
+			{
+				connection.Open();
+				var command = connection.CreateCommand();
+				command.CommandText = "SELECT LastModified FROM Files WHERE FilePath = @p";
+				command.Parameters.AddWithValue("@p", path);
+				object result = command.ExecuteScalar();
+				if (result != null)
+				{
+					return result.ToString();
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+
+		public void SaveFile(string path, string content, string lastMod, long size, string ext)
+		{
+			using (var connection = new SqliteConnection("Data Source=" + dbPath))
+			{
+				connection.Open();
+				var command = connection.CreateCommand();
+				command.CommandText = @"INSERT OR REPLACE INTO Files 
+                    (FilePath, FileName, Content, LastModified, FileSize, Extension) 
+                    VALUES (@p, @n, @c, @m, @s, @e)";
+
+				command.Parameters.AddWithValue("@p", path);
+				command.Parameters.AddWithValue("@n", Path.GetFileName(path));
+				command.Parameters.AddWithValue("@c", content);
+				command.Parameters.AddWithValue("@m", lastMod);
+				command.Parameters.AddWithValue("@s", size);
+				command.Parameters.AddWithValue("@e", ext);
+				command.ExecuteNonQuery();
+			}
+		}
+
+		public List<SearchResult> SearchFiles(string query)
+		{
+			var results = new List<SearchResult>();
+			using (var connection = new SqliteConnection("Data Source=" + dbPath))
+			{
+				connection.Open();
+				var command = connection.CreateCommand();
+				command.CommandText = "SELECT FileName, FilePath, Content FROM Files WHERE Content LIKE @q OR FileName LIKE @q";
+				command.Parameters.AddWithValue("@q", "%" + query + "%");
+
+				using (var reader = command.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						results.Add(new SearchResult
+						{
+							FileName = reader.GetString(0),
+							FilePath = reader.GetString(1),
+							Preview = reader.GetString(2)
+						});
+					}
+				}
+			}
+			return results;
+		}
+
 		public void ClearDatabase()
 		{
-			using (var connection = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=C:\\An3\\SD\\search_engine.db"))
+			using (var connection = new SqliteConnection("Data Source=" + dbPath))
 			{
 				connection.Open();
 				var command = connection.CreateCommand();
 				command.CommandText = "DELETE FROM Files";
 				command.ExecuteNonQuery();
 			}
-		}
-
-		public void SaveFile(string path, string content, string lastModified)
-		{
-			using (var connection = new SqliteConnection("Data Source=" + dbPath))
-			{
-				connection.Open();
-				var command = connection.CreateCommand();
-				command.CommandText = "INSERT OR REPLACE INTO Files (FilePath, FileName, Content, LastModified) VALUES (@p, @n, @c, @m)";
-				command.Parameters.AddWithValue("@p", path);
-				command.Parameters.AddWithValue("@n", Path.GetFileName(path));
-				command.Parameters.AddWithValue("@c", content);
-				command.Parameters.AddWithValue("@m", lastModified);
-				command.ExecuteNonQuery();
-			}
-		}
-
-		public List<string> SearchFiles(string query)
-		{
-			var results = new List<string>();
-			using (var connection = new SqliteConnection("Data Source=" + dbPath))
-			{
-				connection.Open();
-				var command = connection.CreateCommand();
-
-				if (query.ToLower() == "all")
-				{
-					command.CommandText = "SELECT FileName, Content FROM Files";
-				}
-				else
-				{
-					command.CommandText = "SELECT FileName, Content FROM Files WHERE Content LIKE @q OR FileName LIKE @q";
-					command.Parameters.AddWithValue("@q", "%" + query + "%");
-				}
-
-				using (var reader = command.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						results.Add(reader.GetString(0) + " | Preview: " + reader.GetString(1));
-					}
-				}
-			}
-			return results;
 		}
 	}
 }

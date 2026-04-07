@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using SDAssig;
 
@@ -16,31 +16,32 @@ namespace SDAssig
 			crawler = new FileCrawler(db);
 		}
 
-        private void btnIndex_Click(object sender, EventArgs e)
-        {
-            string path = @"C:\An3\SD\testare";
+		private void btnIndex_Click(object sender, EventArgs e)
+		{
+			using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+			{
+				folderDialog.Description = "Select a folder to index";
 
-            db.ClearDatabase();
+				if (folderDialog.ShowDialog() == DialogResult.OK)
+				{
+					string selectedPath = folderDialog.SelectedPath;
 
-            if (!System.IO.Directory.Exists(path))
-            {
-                MessageBox.Show("ERROR: The folder " + path + " does not exist!");
-                return;
-            }
+					db.ClearDatabase();
 
-            var files = System.IO.Directory.GetFiles(path, "*.*", System.IO.SearchOption.AllDirectories);
-            MessageBox.Show("Found " + files.Length + " files in folder.");
+					crawler.IndexDirectory(selectedPath);
+					MessageBox.Show("Indexing completed successfully!");
+				}
+			}
+		}
 
-            crawler.IndexDirectory(path);
-            MessageBox.Show("Indexing complete!");
-        }
-
-        private void btnSearch_Click_1(object sender, EventArgs e)
+		private void btnSearch_Click_1(object sender, EventArgs e)
         {
             string searchTerm = "";
 
-            if (this.Controls.ContainsKey("textSearch")) searchTerm = this.Controls["textSearch"].Text;
-            else if (this.Controls.ContainsKey("txtSearch")) searchTerm = this.Controls["txtSearch"].Text;
+            if (this.Controls.ContainsKey("textSearch")) 
+                searchTerm = this.Controls["textSearch"].Text;
+            else if (this.Controls.ContainsKey("txtSearch")) 
+                searchTerm = this.Controls["txtSearch"].Text;
             else searchTerm = textSearch.Text;
 
             if (string.IsNullOrWhiteSpace(searchTerm))

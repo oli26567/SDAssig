@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using SDAssig;
 
 namespace SDAssig
 {
@@ -9,39 +8,36 @@ namespace SDAssig
 	{
 		private readonly IDatabaseService _db;
 
-		public FileCrawler(IDatabaseService database)
-		{
-			_db = database;
-		}
+		public FileCrawler(IDatabaseService database) => _db = database;
 
 		public void IndexDirectory(string targetDirectory)
 		{
 			string[] allFiles = Directory.GetFiles(targetDirectory, "*.*", SearchOption.AllDirectories);
 
-			List<string> filteredFiles = new List<string>();
-
 			foreach (string filePath in allFiles)
-			{
-				if (filePath.EndsWith(".txt") || filePath.EndsWith(".cs") || filePath.EndsWith(".md"))
-				{
-					filteredFiles.Add(filePath);
-				}
-			}
-
-			foreach (string filePath in filteredFiles)
 			{
 				try
 				{
-					string content = string.Join(" ", File.ReadLines(filePath).Take(3));
-					string lastMod = File.GetLastWriteTime(filePath).ToString();
-					_db.SaveFile(filePath, content, lastMod);
+					string ext = Path.GetExtension(filePath).ToLower();
+					if (ext == ".txt" || ext == ".cs" || ext == ".md")
+					{
+						string currentMod = File.GetLastWriteTime(filePath).ToString();
+						string storedMod = _db.GetStoredTimestamp(filePath);
+
+						if (currentMod != storedMod)
+						{
+							string preview = string.Join(" ", File.ReadLines(filePath).Take(3));
+							long size = new FileInfo(filePath).Length;
+
+							_db.SaveFile(filePath, preview, currentMod, size, ext);
+						}
+					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 
 				}
 			}
 		}
-
 	}
 }
