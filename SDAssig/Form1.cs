@@ -26,7 +26,7 @@ namespace SDAssig
 				{
 					string selectedPath = folderDialog.SelectedPath;
 
-					db.ClearDatabase();
+					//db.ClearDatabase();
 
 					crawler.IndexDirectory(selectedPath);
 					MessageBox.Show("Indexing completed successfully!");

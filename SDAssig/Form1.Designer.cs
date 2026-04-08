@@ -36,14 +36,14 @@
             // 
             // textSearch
             // 
-            textSearch.Location = new Point(89, 81);
+            textSearch.Location = new Point(12, 81);
             textSearch.Name = "textSearch";
-            textSearch.Size = new Size(125, 27);
+            textSearch.Size = new Size(202, 27);
             textSearch.TabIndex = 0;
             // 
             // btnSearch
             // 
-            btnSearch.Location = new Point(294, 81);
+            btnSearch.Location = new Point(230, 80);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(94, 29);
             btnSearch.TabIndex = 1;
@@ -53,7 +53,7 @@
             // 
             // btnIndex
             // 
-            btnIndex.Location = new Point(448, 81);
+            btnIndex.Location = new Point(362, 79);
             btnIndex.Name = "btnIndex";
             btnIndex.Size = new Size(94, 29);
             btnIndex.TabIndex = 2;
@@ -64,9 +64,9 @@
             // lstResults
             // 
             lstResults.FormattingEnabled = true;
-            lstResults.Location = new Point(89, 165);
+            lstResults.Location = new Point(12, 142);
             lstResults.Name = "lstResults";
-            lstResults.Size = new Size(453, 144);
+            lstResults.Size = new Size(776, 284);
             lstResults.TabIndex = 3;
             // 
             // Form1
